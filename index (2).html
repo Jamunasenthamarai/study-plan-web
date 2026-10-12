@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyFlow — Academic Momentum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#2a14b4; --indigo:#4338ca; --bg:#faf8ff; --surface-low:#f2f3ff; --surface:#eaedff; --surface-high:#e2e7ff;
+  --lavender:#e3dfff; --ink:#131b2e; --ink-2:#464554; --muted:#777586; --green:#006c4a; --mint:#82f5c1; --red:#ba1a1a;
+  --amber:#5c2f00; --amber-bg:#ffdcc2; --line:#e2e0f0;
+  --jakarta:'Plus Jakarta Sans','Inter',system-ui,sans-serif; --inter:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--jakarta);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select{font-family:inherit}
+svg.i{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.app{display:grid;grid-template-columns:288px minmax(0,1fr);min-height:100vh}
+
+/* ---------- Sidebar ---------- */
+aside{background:var(--surface-low);padding:24px 16px;display:flex;flex-direction:column;justify-content:space-between;position:sticky;top:0;height:100vh;box-shadow:0 1px 4px rgba(0,0,0,.04);overflow-y:auto}
+.brand{display:flex;gap:8px;align-items:center;padding:0 4px}
+.brand .logo{width:40px;height:40px;border-radius:12px;background:var(--primary);display:grid;place-items:center;color:#fff;font-size:22px;box-shadow:0 1px 1px rgba(0,0,0,.05)}
+.brand b{display:block;font-size:18px;font-weight:600;letter-spacing:-.45px;line-height:18px}
+.brand small{display:block;margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.55px;text-transform:uppercase;color:var(--muted);line-height:14px;max-width:90px}
+.side-stack{display:flex;flex-direction:column;gap:24px}
+.profile{background:#fff;border-radius:12px;padding:8px;display:flex;gap:8px;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+.profile .av{width:40px;height:40px;border-radius:50%;background:var(--lavender);display:grid;place-items:center;color:var(--primary);font-size:18px}
+.profile b{display:block;font-size:14px;font-weight:600;line-height:20px}
+.profile span{display:block;font-size:12px;font-weight:600;color:var(--ink-2);line-height:16px}
+.profile em{display:block;font-style:normal;font-size:11px;font-weight:700;color:var(--primary);line-height:14px}
+.mini-stats{background:var(--surface);border-radius:12px;padding:4px;display:flex;gap:4px}
+.mini-stats div{flex:1;background:#fff;border-radius:8px;padding:4px;text-align:center}
+.mini-stats b{display:block;font-size:18px;font-weight:600;line-height:26px}
+.mini-stats span{display:block;font-size:11px;font-weight:700;color:var(--ink-2);line-height:14px}
+nav{display:flex;flex-direction:column;gap:4px}
+nav a{display:flex;gap:8px;align-items:center;padding:4px 8px;border-radius:12px;font-size:14px;font-weight:600;color:var(--ink-2);text-decoration:none;min-height:28px;transition:background .15s}
+nav a:hover{background:var(--surface)}
+nav a.active{background:var(--indigo);color:#fff;font-family:var(--inter);font-weight:700;font-size:15px;min-height:32px}
+nav a svg{font-size:16px}
+.pomodoro{background:#fff;border-radius:12px;padding:8px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.pomodoro span{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:600}
+.pill-active{background:var(--mint);color:var(--green);font-size:11px;font-weight:700;padding:2px 6px;border-radius:99px}
+
+/* ---------- Header ---------- */
+.col{min-width:0;max-width:992px;width:100%}
+header.top{position:sticky;top:0;z-index:20;height:64px;display:flex;gap:42px;align-items:center;padding:0 24px;background:rgba(250,248,255,.85);backdrop-filter:blur(12px);box-shadow:0 1px 8px rgba(0,0,0,.04)}
+.hl{display:flex;flex:1;gap:16px;align-items:center;max-width:576px;min-width:0}
+.search{position:relative;flex:1;min-width:0}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px}
+.search input{width:100%;border:0;background:#fff;border-radius:12px;padding:7px 16px 7px 40px;font:400 13px var(--inter);color:var(--ink);outline:none}
+.search input:focus{box-shadow:0 0 0 2px var(--lavender)}
+.term{display:flex;gap:4px;align-items:center;background:var(--surface);padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.hr{display:flex;gap:16px;align-items:center}
+.streak{display:flex;gap:4px;align-items:center;background:var(--surface-high);color:var(--amber);padding:4px 8px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}
+.btn-add{display:flex;gap:4px;align-items:center;background:var(--primary);color:#fff;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600;line-height:16px;height:24px;box-shadow:0 1px 1px rgba(0,0,0,.05);white-space:nowrap}
+.bell{position:relative;width:36px;height:36px;border-radius:12px;background:var(--surface);display:grid;place-items:center}
+.bell i{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--red)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:12px}
+
+/* ---------- Sections ---------- */
+main{padding-bottom:0}
+section{padding:40px}
+section.s1{padding:24px 40px 40px}
+.eyebrow{display:flex;gap:4px;align-items:center;font-size:12px;font-weight:700;color:var(--primary);letter-spacing:.3px;text-transform:uppercase;margin-bottom:0;line-height:16px}
+.eyebrow svg{font-size:13px}
+h2{font-size:32px;line-height:40px;font-weight:700;letter-spacing:-.8px;color:var(--ink)}
+.sec-head{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap}
+.sec-head p{font:400 15px/24px var(--inter);color:var(--ink-2);margin-top:0;max-width:570px}
+.card{background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+
+/* Banner */
+.banner{position:relative;overflow:hidden;border-radius:24px;padding:40px;color:#fff;background:linear-gradient(120deg,#2a14b4 0%,#4338ca 60%,#5b4fe0 100%);display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap}
+.banner:before,.banner:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.08);filter:blur(24px)}
+.banner:before{width:320px;height:320px;right:-16px;top:-16px}
+.banner:after{width:256px;height:256px;left:352px;top:-48px;display:none}
+.banner>*{position:relative;z-index:1}
+.b-left{flex:1 1 380px;max-width:581px}
+.b-tag{display:flex;gap:4px;align-items:center;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;line-height:16px}
+.b-tag .ov{background:rgba(255,255,255,.2);padding:0 4px;border-radius:4px;font-size:11px;line-height:18px}
+.banner h1{font-size:34px;line-height:40px;font-weight:700;letter-spacing:-.85px;margin:4px 0}
+.banner p.sub{font:400 15px/24px var(--inter);color:rgba(255,255,255,.85);margin-bottom:8px}
+.pills{display:flex;gap:4px;flex-wrap:wrap}
+.pills span{display:flex;gap:6px;align-items:center;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);padding:4px 8px;border-radius:99px;font-size:12px;font-weight:600;line-height:14px;white-space:nowrap}
+.pills .dot{width:8px;height:8px;border-radius:50%;background:var(--mint)}
+.b-actions{display:flex;flex-direction:column;gap:4px;width:194px}
+.btn-white{background:#fff;color:var(--primary);border-radius:12px;height:36px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.b-actions .row{display:flex;gap:4px}
+.b-actions .row button{flex:1;background:rgba(255,255,255,.15);border-radius:12px;height:48px;font-size:12px;font-weight:600;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;align-items:start}
+.kpi{padding:16px}
+.kpi .t{display:flex;justify-content:space-between;align-items:center;height:32px}
+.kpi .t span{font-size:13px;font-weight:600;color:var(--ink-2)}
+.kpi .ic{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--lavender);color:var(--primary);font-size:15px}
+.kpi .big{display:flex;align-items:flex-end;gap:4px;margin-top:8px}
+.kpi .big b{font-size:32px;line-height:40px;font-weight:700;letter-spacing:-.8px}
+.kpi .big span{font:500 14px/20px var(--inter);color:var(--ink-2);margin-bottom:3px}
+.bar{height:8px;border-radius:99px;background:var(--surface);margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--primary)}
+.kpi small{display:block;font-size:11px;font-weight:600;color:var(--ink-2);margin-top:6px;line-height:14px}
+.tagrow{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:700;padding:2px 4px;border-radius:4px;line-height:14px;white-space:nowrap}
+.t-red{background:#ffdad6;color:var(--red)}
+.t-blue{background:var(--lavender);color:var(--primary)}
+.t-green{background:var(--mint);color:var(--green)}
+.t-amber{background:var(--amber-bg);color:var(--amber)}
+.t-grey{background:var(--surface);color:var(--ink-2)}
+.kpi.ring{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.kpi.ring small.cap{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.ringsvg{position:relative;width:80px;height:80px;flex-shrink:0}
+.ringsvg svg{width:80px;height:80px;transform:rotate(-90deg)}
+.ringsvg .c{position:absolute;inset:0;display:grid;place-items:center;color:var(--primary);font-size:20px}
+
+/* Tasks */
+.s2{background:var(--bg)}
+.filters{display:flex;flex-wrap:wrap;gap:4px;background:var(--surface);padding:4px;border-radius:12px;max-width:312px}
+.filters button{font-size:12px;font-weight:600;padding:5px 8px;border-radius:8px;color:var(--ink-2);line-height:16px}
+.filters button.on{background:#fff;color:var(--primary);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.addbar{display:flex;gap:4px;align-items:center;padding:8px;margin-bottom:16px;flex-wrap:wrap}
+.addbar .inp{position:relative;flex:1 1 280px;min-width:0}
+.addbar .inp svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px}
+.addbar input{width:100%;border:0;background:var(--surface-low);border-radius:12px;padding:6px 16px 6px 40px;font:400 13px var(--inter);outline:none;height:28px}
+.addbar select{border:0;background:var(--surface-low);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--ink-2);height:25px;outline:none}
+.addbar .go{display:flex;gap:4px;align-items:center;background:var(--primary);color:#fff;font-size:12px;font-weight:600;border-radius:8px;padding:0 16px;height:24px}
+.chips{display:flex;gap:4px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
+.chips span{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.chips button{font-size:11px;font-weight:700;padding:4px 8px;border-radius:99px;background:var(--surface);color:var(--ink-2);line-height:14px}
+.chips button.on{background:var(--primary);color:#fff}
+.tasks{display:flex;flex-direction:column;gap:4px}
+.task{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px}
+.task .l{display:flex;gap:8px;flex:1;min-width:0}
+.ck{width:24px;height:24px;border-radius:50%;border:2px solid #c7c4d7;display:grid;place-items:center;margin-top:2px;flex-shrink:0;color:transparent;font-size:12px;transition:.15s}
+.task.done .ck{background:var(--green);border-color:var(--green);color:#fff}
+.task .meta{display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap}
+.task h4{font:600 15px/20px var(--jakarta);color:var(--ink)}
+.task p{font:400 13px/20px var(--inter);color:var(--ink-2)}
+.task.done h4{text-decoration:line-through;color:var(--muted)}
+.task.done p{color:var(--muted)}
+.task .r{display:flex;gap:16px;align-items:center;text-align:right;flex-shrink:0}
+.task .r b{display:block;font-size:12px;font-weight:700;line-height:14px}
+.task .r span{display:block;font-size:11px;font-weight:600;color:var(--ink-2);line-height:14px}
+.task .r .urgent{color:var(--red)}
+.task .more{color:var(--muted);font-size:14px}
+.task.hide{display:none}
+
+/* Planner */
+.s3{background:var(--surface-low)}
+.pa{display:flex;gap:4px}
+.pa button{background:#fff;border-radius:12px;padding:0 12px;height:40px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.pa button.pri{background:var(--primary);color:#fff}
+.week{display:grid;grid-template-columns:repeat(7,minmax(130px,1fr));gap:8px;overflow-x:auto;padding-bottom:8px}
+.day{background:#fff;border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:4px;min-width:130px}
+.day.today{outline:2px solid var(--primary);box-shadow:0 4px 14px rgba(42,20,180,.18)}
+.day .dh{display:flex;justify-content:space-between;align-items:center;height:20px}
+.day .dh b{font-size:14px;font-weight:700}
+.day .dh span{font-size:11px;font-weight:600;color:var(--muted)}
+.day .tot{background:var(--surface-low);border-radius:6px;font-size:10px;font-weight:700;text-align:center;color:var(--ink-2);padding:2px 0;line-height:14px}
+.day.today .tot{background:var(--primary);color:#fff}
+.slot{border-radius:8px;padding:4px;background:var(--surface-low);min-height:68px;display:flex;flex-direction:column;gap:4px}
+.slot .sh{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--muted);line-height:14px}
+.slot .sh i{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.slot .sh i.p{background:#c7c4d7}
+.slot b{font-size:11px;font-weight:700;line-height:14px;color:var(--ink)}
+.slot span{font:500 11px/12px var(--inter);color:var(--ink-2)}
+.slot.eve{min-height:40px;background:#fff;border:1px dashed var(--line)}
+.slot.live{background:var(--lavender)}
+.slot.done{background:#e9fbf3}
+.hint{display:flex;justify-content:space-between;gap:12px;margin-top:16px;font-size:12px;font-weight:600;color:var(--ink-2);padding:0 8px;flex-wrap:wrap}
+.hint span{display:flex;gap:6px;align-items:center}
+
+/* Reminders */
+.channels{display:flex;flex-wrap:wrap;gap:4px;background:var(--surface);padding:4px;border-radius:12px;max-width:308px}
+.channels label{display:flex;gap:6px;align-items:center;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;background:#fff;cursor:pointer;line-height:14px}
+.channels input{accent-color:var(--primary);width:13px;height:13px}
+.dual{display:grid;grid-template-columns:7fr 5fr;gap:16px;align-items:start}
+.tl-head{display:flex;justify-content:space-between;align-items:center;height:20px;margin-bottom:8px}
+.tl-head b{font-size:16px;font-weight:700}
+.tl-head span{font-size:11px;font-weight:700;color:var(--red)}
+.alert{display:flex;gap:16px;padding:16px;margin-bottom:8px;border-left:4px solid var(--red)}
+.alert.amber{border-color:#d97706}.alert.blue{border-color:var(--primary)}
+.alert .ic{width:40px;height:40px;border-radius:50%;background:#ffdad6;color:var(--red);display:grid;place-items:center;font-size:17px;flex-shrink:0}
+.alert.amber .ic{background:var(--amber-bg);color:var(--amber)}
+.alert.blue .ic{background:var(--lavender);color:var(--primary)}
+.alert .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.alert h4{font:700 15px/20px var(--jakarta)}
+.alert p{font:400 13px/20px var(--inter);color:var(--ink-2)}
+.alert .m{display:flex;gap:16px;margin-top:4px;font-size:11px;font-weight:600;color:var(--ink-2);flex-wrap:wrap}
+.alert .m span{display:flex;gap:4px;align-items:center}
+.routine{padding:16px}
+.routine .rh{display:flex;justify-content:space-between;align-items:center}
+.routine .rh b{font-size:16px;font-weight:700;line-height:20px}
+.routine .rh svg{color:var(--primary);font-size:16px}
+.routine p{font:400 13px/20px var(--inter);color:var(--ink-2);margin:8px 0}
+.habit{display:flex;justify-content:space-between;align-items:center;padding:4px;font-size:13px;font-weight:600;border-radius:8px}
+.habit:nth-child(odd){background:var(--surface-low)}
+.habit span{display:flex;gap:8px;align-items:center}
+.habit svg{color:var(--primary)}
+.habit em{font-style:normal;font-size:11px;font-weight:700;color:var(--muted)}
+.rfoot{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:16px;padding-top:16px;font-size:11px;font-weight:700;color:var(--ink-2)}
+.rfoot a{color:var(--primary);text-decoration:none;font-size:12px}
+
+/* Questions */
+.s5{background:var(--bg)}
+.q-add{display:flex;gap:6px;align-items:center;background:var(--primary);color:#fff;font-size:12px;font-weight:600;padding:0 16px;height:24px;border-radius:8px;white-space:nowrap}
+.qs{display:flex;flex-direction:column;gap:8px}
+.q{padding:16px}
+.q .qt{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.q .qt .tags{display:flex;gap:4px;flex-wrap:wrap}
+.q .qt .btns{display:flex;gap:4px;align-items:center}
+.q .qt .btns .bm{color:var(--muted);font-size:16px;padding:4px}
+.q .qt .btns .bm.on{color:var(--primary)}
+.q .qt .btns .ex{display:flex;gap:6px;align-items:center;background:var(--surface-low);border-radius:8px;font-size:11px;font-weight:700;padding:4px 8px;color:var(--primary)}
+.q h3{font:700 18px/26px var(--jakarta);letter-spacing:-.2px;margin:4px 0}
+.q .topic{font:400 13px/20px var(--inter);color:var(--ink-2)}
+.q .ans{display:none;margin-top:12px;padding:12px;background:var(--surface-low);border-radius:12px;font:400 13px/20px var(--inter);color:var(--ink-2)}
+.q.open .ans{display:block}
+.q.open .ex svg{transform:rotate(180deg)}
+
+/* Progress */
+.s6{background:var(--surface-low)}
+.bento{display:grid;grid-template-columns:7fr 5fr;gap:16px;align-items:start}
+.chart{padding:16px}
+.chart .ch{display:flex;justify-content:space-between;align-items:flex-start}
+.chart .ch b{font-size:16px;font-weight:700;line-height:20px;display:block}
+.chart .ch span.s{display:block;font-size:11px;font-weight:600;color:var(--ink-2);margin-top:4px}
+.chart .ch .badge{background:var(--surface);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;color:var(--primary);margin-top:8px}
+.bars{position:relative;height:192px;margin-top:24px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 8px;background:
+  linear-gradient(var(--line),var(--line)) 0 49px/100% 1px no-repeat,
+  linear-gradient(var(--line),var(--line)) 0 96px/100% 1px no-repeat,
+  linear-gradient(var(--line),var(--line)) 0 143px/100% 1px no-repeat}
+.bars .b{width:12%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;padding-bottom:49px;position:relative}
+.bars .b i{display:block;width:100%;max-width:33px;border-radius:6px 6px 0 0;background:var(--primary);opacity:.9}
+.bars .b.today i{background:var(--indigo);opacity:1}
+.bars .b em{font-style:normal;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.bars .b span{position:absolute;bottom:26px;font-size:11px;font-weight:600;color:var(--muted)}
+.cfoot{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:16px;padding-top:12px;font-size:11px;font-weight:700;color:var(--ink-2);gap:8px;flex-wrap:wrap}
+.cfoot span{display:flex;gap:4px;align-items:center}
+.streak-card{padding:16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px}
+.streak-card small{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.streak-card .n{display:flex;align-items:flex-end;gap:4px;margin:4px 0}
+.streak-card .n b{font-size:32px;line-height:40px;font-weight:700;color:var(--primary)}
+.streak-card .n span{font:600 14px/20px var(--inter);color:var(--ink-2);margin-bottom:3px}
+.streak-card p{font:400 13px/20px var(--inter);color:var(--ink-2);max-width:170px}
+.streak-card .fl{width:43px;height:56px;border-radius:99px;background:var(--amber-bg);color:#d97706;display:grid;place-items:center;font-size:22px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.comp{padding:16px}
+.comp>b{display:block;font-size:14px;font-weight:700;line-height:20px;margin-bottom:8px}
+.comp .row{margin-top:10px}
+.comp .row div{display:flex;justify-content:space-between;font-size:12px;font-weight:600;line-height:14px}
+.comp .row .bar{margin-top:4px}
+.refl{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+.refl .card{padding:16px;display:flex;gap:8px}
+.refl .ic{width:32px;height:32px;border-radius:50%;background:var(--lavender);color:var(--primary);display:grid;place-items:center;font-size:14px;flex-shrink:0}
+.refl b{font-size:14px;font-weight:700;line-height:20px;display:block;margin-bottom:4px}
+.refl p{font:400 13px/20px var(--inter);color:var(--ink-2)}
+
+/* Form */
+.sform{background:var(--bg)}
+.formcard{display:grid;grid-template-columns:1fr 1fr;border-radius:24px;overflow:hidden;box-shadow:0 4px 20px rgba(42,20,180,.1)}
+.formcard .fl{background:linear-gradient(135deg,#2a14b4,#4338ca);color:#fff;padding:40px}
+.formcard .fl h2{color:#fff;font-size:28px;line-height:34px}
+.formcard .fl p{font:400 15px/24px var(--inter);color:rgba(255,255,255,.85);margin-top:12px}
+.formcard .fl ul{list-style:none;margin-top:20px;display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:600}
+.formcard .fl li{display:flex;gap:8px;align-items:center}
+.formcard .fr{background:#fff;padding:40px}
+.formcard label{display:block;font-size:12px;font-weight:700;color:var(--ink-2);margin:0 0 4px}
+.formcard .fld{margin-bottom:16px}
+.formcard input{width:100%;border:1.5px solid var(--line);background:var(--surface-low);border-radius:12px;padding:10px 14px;font:500 14px var(--inter);color:var(--ink);outline:none;transition:.15s}
+.formcard input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px var(--lavender)}
+.formcard .submit{width:100%;background:var(--primary);color:#fff;font-size:14px;font-weight:700;border-radius:12px;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 8px rgba(42,20,180,.3)}
+.formcard .submit:disabled{opacity:.6;cursor:wait}
+.msg{display:none;margin-top:12px;font-size:13px;font-weight:600;padding:10px 12px;border-radius:10px}
+.msg.ok{display:block;background:#e9fbf3;color:var(--green)}
+.msg.err{display:block;background:#ffdad6;color:var(--red)}
+
+/* FAQ + footer */
+.s7{background:var(--surface-low)}
+.faq-head{text-align:center;margin-bottom:24px}
+.faq-head .eyebrow{justify-content:center}
+.faq-head h2{margin-top:4px}
+.faq-head p{font:400 15px/24px var(--inter);color:var(--ink-2);max-width:584px;margin:4px auto 0}
+.faqs{max-width:896px;margin:0 auto;display:flex;flex-direction:column;gap:4px}
+.faq{background:#fff;border-radius:12px}
+.faq button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px;text-align:left;font:600 15px/20px var(--jakarta)}
+.faq button svg{font-size:11px;transition:.2s;color:var(--primary)}
+.faq .a{display:none;padding:0 16px 16px;font:400 13px/20px var(--inter);color:var(--ink-2)}
+.faq.open .a{display:block}
+.faq.open button svg{transform:rotate(180deg)}
+.help{margin-top:40px;background:#fff;border-radius:16px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.help .hl2{display:flex;gap:16px;align-items:center}
+.help .ic{width:48px;height:48px;border-radius:50%;background:var(--lavender);color:var(--primary);display:grid;place-items:center;font-size:20px}
+.help b{font:700 18px/26px var(--jakarta);display:block}
+.help span.d{font:400 13px/20px var(--inter);color:var(--ink-2)}
+.help .hb{display:flex;gap:4px}
+.help .hb button{background:var(--primary);color:#fff;font-size:12px;font-weight:600;border-radius:12px;padding:0 16px;height:24px}
+.help .hb a{background:var(--surface);color:var(--primary);font-size:12px;font-weight:600;border-radius:12px;padding:0 16px;height:24px;display:flex;align-items:center;text-decoration:none}
+footer{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:40px;font-size:12px}
+footer .fb{display:flex;gap:8px;align-items:center;font-weight:600}
+footer .fb .lg{width:21px;height:24px;border-radius:6px;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:12px}
+footer .fb b{font-size:16px;font-weight:600}
+footer .fb span{color:var(--muted)}
+footer .links{display:flex;gap:16px}
+footer .links a{color:var(--ink-2);font-weight:600;text-decoration:none}
+footer .links a:hover{color:var(--primary)}
+footer .cp{color:var(--muted);font-weight:500}
+
+/* Responsive */
+@media (max-width:1100px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .dual,.bento,.formcard{grid-template-columns:1fr}
+}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  aside{position:static;height:auto;gap:16px}
+  nav{flex-direction:row;flex-wrap:wrap}
+  .pomodoro{display:none}
+  section,section.s1{padding:24px 16px}
+  header.top{gap:12px;padding:0 12px}
+  .streak,.term{display:none}
+  .banner{padding:24px}
+  .banner h1{font-size:26px;line-height:32px}
+  h2{font-size:26px;line-height:32px}
+  .b-actions{width:100%}
+  .refl{grid-template-columns:1fr}
+  .task{flex-direction:column;align-items:flex-start}
+  .task .r{width:100%;justify-content:space-between}
+  .formcard .fl,.formcard .fr{padding:24px}
+}
+@media (max-width:560px){.kpis{grid-template-columns:1fr}.hr .btn-add span{display:none}}
+</style>
+</head>
+<body>
+
+<!-- SVG icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/><path d="M22 10v6"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></symbol>
+    <symbol id="i-tasks" viewBox="0 0 24 24"><path d="m3 7 2 2 4-4M3 17l2 2 4-4M13 7h8M13 17h8"/></symbol>
+    <symbol id="i-cols" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 4v16M15 4v16"/></symbol>
+    <symbol id="i-alarm" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M22 6l-3-3"/></symbol>
+    <symbol id="i-qbox" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></symbol>
+    <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="14" r="8"/><path d="M12 10v4M9 2h6M12 2v4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-4-1-6 1-9z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M19 21 12 16 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="i-brain" viewBox="0 0 24 24"><path d="M12 4a3 3 0 0 0-5.6 1.5A3.5 3.5 0 0 0 4 9a3.5 3.5 0 0 0 1 6 3 3 0 0 0 5 2.2V4zM12 4a3 3 0 0 1 5.6 1.5A3.5 3.5 0 0 1 20 9a3.5 3.5 0 0 1-1 6 3 3 0 0 1-5 2.2V4z"/></symbol>
+    <symbol id="i-drag" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.2"/><circle cx="15" cy="6" r="1.2"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><circle cx="9" cy="18" r="1.2"/><circle cx="15" cy="18" r="1.2"/></symbol>
+    <symbol id="i-headset" viewBox="0 0 24 24"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside>
+    <div class="side-stack">
+      <div class="brand">
+        <div class="logo"><svg class="i"><use href="#i-book"/></svg></div>
+        <div><b>StudyFlow</b><small>Academic Momentum</small></div>
+      </div>
+      <div class="profile">
+        <div class="av"><svg class="i"><use href="#i-cap"/></svg></div>
+        <div><b>Alex Chen</b><span>CS &amp; Data Science</span><em>Sophomore</em></div>
+      </div>
+      <div class="mini-stats">
+        <div><b style="color:var(--primary)">92%</b><span>Completion</span></div>
+        <div><b style="color:var(--green)">28h</b><span>Study Time</span></div>
+      </div>
+      <nav>
+        <a href="#dashboard" class="active"><svg class="i"><use href="#i-grid"/></svg>Dashboard</a>
+        <a href="#tasks"><svg class="i"><use href="#i-tasks"/></svg>My Tasks</a>
+        <a href="#planner"><svg class="i"><use href="#i-cols"/></svg>Weekly Planner</a>
+        <a href="#reminders"><svg class="i"><use href="#i-alarm"/></svg>Schedule &amp; Reminders</a>
+        <a href="#questions"><svg class="i"><use href="#i-qbox"/></svg>Important Questions</a>
+        <a href="#progress"><svg class="i"><use href="#i-trend"/></svg>Progress Tracker</a>
+        <a href="#faqs"><svg class="i"><use href="#i-qbox"/></svg>FAQs &amp; Support</a>
+      </nav>
+    </div>
+    <div class="pomodoro">
+      <span><svg class="i" style="font-size:16px"><use href="#i-timer"/></svg>Pomodoro</span>
+      <span class="pill-active">Active</span>
+    </div>
+  </aside>
+
+  <div class="col">
+    <!-- ============ HEADER ============ -->
+    <header class="top">
+      <div class="hl">
+        <div class="search">
+          <svg class="i"><use href="#i-search"/></svg>
+          <input type="text" placeholder="Search assignments, courses, flashcards...">
+        </div>
+        <div class="term"><svg class="i" style="font-size:16px"><use href="#i-cap"/></svg>Fall 2024<svg class="i" style="font-size:8px"><use href="#i-chev"/></svg></div>
+      </div>
+      <div class="hr">
+        <div class="streak"><svg class="i"><use href="#i-flame"/></svg>14-day streak</div>
+        <button class="btn-add" onclick="document.getElementById('newTask').focus();location.hash='tasks'"><svg class="i" style="font-size:11px"><use href="#i-plus"/></svg><span>Add Task</span></button>
+        <div class="bell"><svg class="i" style="font-size:15px"><use href="#i-bell"/></svg><i></i></div>
+        <div class="avatar"><svg class="i"><use href="#i-user"/></svg></div>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- ============ SECTION 1: DASHBOARD ============ -->
+      <section class="s1" id="dashboard">
+        <div class="banner">
+          <div class="b-left">
+            <div class="b-tag"><svg class="i"><use href="#i-bolt"/></svg>Academic Momentum <span class="ov">Wk 8</span></div>
+            <h1>Welcome back, Alex! You're on a roll this week.</h1>
+            <p class="sub">You've completed most of your planned sessions. Keep your focus strong ahead of Friday's midterm review.</p>
+            <div class="pills">
+              <span><i class="dot"></i>On Track</span>
+              <span><svg class="i" style="font-size:12px"><use href="#i-flame"/></svg>14-day streak</span>
+              <span><svg class="i" style="font-size:12px"><use href="#i-clock"/></svg>28h studied</span>
+              <span><svg class="i" style="font-size:12px"><use href="#i-trend"/></svg>Top 5% of learners</span>
+            </div>
+          </div>
+          <div class="b-actions">
+            <button class="btn-white"><svg class="i" style="font-size:18px"><use href="#i-brain"/></svg>Start Focus</button>
+            <div class="row">
+              <button><svg class="i" style="font-size:15px"><use href="#i-book"/></svg>Notes</button>
+              <button><svg class="i" style="font-size:15px"><use href="#i-cal"/></svg>Plan</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="card kpi">
+            <div class="t"><span>Focus Hours</span><div class="ic"><svg class="i"><use href="#i-clock"/></svg></div></div>
+            <div class="big"><b>28</b><span>hrs</span></div>
+            <div class="bar"><i style="width:80%"></i></div>
+            <small>80% of weekly 35h target</small>
+          </div>
+          <div class="card kpi">
+            <div class="t"><span>Active Tasks</span><div class="ic"><svg class="i"><use href="#i-tasks"/></svg></div></div>
+            <div class="big"><b>3</b><span>pending</span></div>
+            <div class="tagrow"><span class="tag t-red">Urgent</span><span class="tag t-amber">Today</span><span class="tag t-blue">Lab</span></div>
+          </div>
+          <div class="card kpi">
+            <div class="t"><span>Midterm Countdown</span><div class="ic"><svg class="i"><use href="#i-alarm"/></svg></div></div>
+            <div class="big"><b>5</b><span>days</span></div>
+            <small style="font-size:12px;color:var(--ink);font-weight:600">CS201 Data Structures</small>
+            <small style="display:flex;justify-content:space-between"><span>Revision 72% done</span><span style="color:var(--red)">Soon</span></small>
+          </div>
+          <div class="card kpi ring">
+            <div>
+              <small class="cap">Weekly<br>Goal</small>
+              <div class="big" style="margin-top:4px"><b style="font-size:24px;line-height:30px;color:var(--primary)">88%</b></div>
+              <small>On track</small>
+            </div>
+            <div class="ringsvg">
+              <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#eaedff" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="#2a14b4" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="25.6"/></svg>
+              <div class="c"><svg class="i"><use href="#i-bolt"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SECTION 2: MY TASKS ============ -->
+      <section class="s2" id="tasks">
+        <div class="sec-head">
+          <div style="max-width:568px">
+            <div class="eyebrow"><svg class="i"><use href="#i-tasks"/></svg>Task Manager</div>
+            <h2>Keep Every Assignment in Sight</h2>
+            <p>Capture, prioritise and tick off your coursework. Filter by status or by course to focus on what matters now.</p>
+          </div>
+          <div class="filters" id="statusFilters">
+            <button class="on" data-f="all">All</button>
+            <button data-f="pending">Pending</button>
+            <button data-f="done">Completed</button>
+            <button data-f="urgent">Urgent Only</button>
+          </div>
+        </div>
+
+        <div class="card addbar">
+          <div class="inp">
+            <svg class="i"><use href="#i-plus"/></svg>
+            <input id="newTask" type="text" placeholder="Add study task (e.g., 'CS201: Implement Red-Black Tree delete')...">
+          </div>
+          <select id="newCourse"><option value="CS201">CS201</option><option value="MATH302">MATH302</option><option value="PHYS105">PHYS105</option></select>
+          <select id="newPri"><option>Medium</option><option>High</option><option>Low</option></select>
+          <button class="go" id="addTaskBtn"><svg class="i" style="font-size:11px"><use href="#i-check"/></svg>Add</button>
+        </div>
+
+        <div class="chips" id="courseChips">
+          <span>Filter by course</span>
+          <button class="on" data-c="all">All</button>
+          <button data-c="CS201">CS201 Data Structures</button>
+          <button data-c="MATH302">MATH302 Linear Algebra</button>
+          <button data-c="PHYS105">PHYS105 Electromagnetism</button>
+        </div>
+
+        <div class="tasks" id="taskList">
+          <div class="card task" data-course="CS201" data-urgent="1">
+            <div class="l"><button class="ck"><svg class="i"><use href="#i-check"/></svg></button>
+              <div><div class="meta"><span class="tag t-blue">CS201</span><span class="tag t-red">High Priority</span><span class="tag t-amber">Urgent</span></div>
+              <h4>Implement Red-Black Tree delete</h4><p>Handle all double-black cases and verify with the provided unit test suite before submitting.</p></div></div>
+            <div class="r"><div><b class="urgent">Due Today</b><span>11:59 PM</span></div><button class="more"><svg class="i"><use href="#i-dots"/></svg></button></div>
+          </div>
+          <div class="card task" data-course="MATH302" data-urgent="0">
+            <div class="l"><button class="ck"><svg class="i"><use href="#i-check"/></svg></button>
+              <div><div class="meta"><span class="tag t-blue">MATH302</span><span class="tag t-amber">Medium</span><span class="tag t-grey">Homework</span></div>
+              <h4>Matrix proof — Problem Set #4</h4><p>Complete proofs for questions 3 to 7 and upload the PDF to the Gradescope portal.</p></div></div>
+            <div class="r"><div><b>Tomorrow</b><span>9:00 AM</span></div><button class="more"><svg class="i"><use href="#i-dots"/></svg></button></div>
+          </div>
+          <div class="card task" data-course="PHYS105" data-urgent="0">
+            <div class="l"><button class="ck"><svg class="i"><use href="#i-check"/></svg></button>
+              <div><div class="meta"><span class="tag t-blue">PHYS105</span><span class="tag t-amber">Medium</span><span class="tag t-grey">Lab</span></div>
+              <h4>Lab report — Gauss's flux law</h4><p>Write up the analysis section with error margins and attach the measurement data tables to the report.</p></div></div>
+            <div class="r"><div><b>Friday</b><span>5:00 PM</span></div><button class="more"><svg class="i"><use href="#i-dots"/></svg></button></div>
+          </div>
+          <div class="card task done" data-course="CS201" data-urgent="0">
+            <div class="l"><button class="ck"><svg class="i"><use href="#i-check"/></svg></button>
+              <div><div class="meta"><span class="tag t-blue">CS201</span><span class="tag t-green">Done</span></div>
+              <h4>Review heap data structures</h4><p>Finished practice questions on binary heaps, heapify and priority queues.</p></div></div>
+            <div class="r"><div><span>Completed Mon</span></div><button class="more"><svg class="i"><use href="#i-dots"/></svg></button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SECTION 3: WEEKLY STUDY PLANNER ============ -->
+      <section class="s3" id="planner">
+        <div class="sec-head">
+          <div style="max-width:535px">
+            <div class="eyebrow"><svg class="i"><use href="#i-cols"/></svg>Weekly Study Planner</div>
+            <h2>Plan Your Week Ahead</h2>
+            <p>A 7-day view with morning, afternoon and evening slots, so your study load stays balanced and nothing slips.</p>
+          </div>
+          <div class="pa">
+            <button>&#8249; Prev</button><button class="pri">This Week</button><button>Next &#8250;</button>
+          </div>
+        </div>
+
+        <div class="week">
+          <div class="day"><div class="dh"><b>Mon</b><span>Oct 14</span></div><div class="tot">4.5 hrs total</div>
+            <div class="slot done"><div class="sh">AM<i></i></div><b>CS201: Heaps Intro</b><span>2.0 hrs • Done</span></div>
+            <div class="slot done"><div class="sh">PM<i></i></div><b>MATH302: HW Set</b><span>2.5 hrs • Done</span></div>
+            <div class="slot eve"><div class="sh">EVE</div><b>Rest &amp; Recovery</b></div></div>
+          <div class="day"><div class="dh"><b>Tue</b><span>Oct 15</span></div><div class="tot">5.0 hrs total</div>
+            <div class="slot done"><div class="sh">AM<i></i></div><b>PHYS105: Flux Law</b><span>2.0 hrs • Done</span></div>
+            <div class="slot done"><div class="sh">PM<i></i></div><b>CS201: Tree Rotations</b><span>3.0 hrs • Done</span></div>
+            <div class="slot eve"><div class="sh">EVE</div><b>Flashcards 30m</b></div></div>
+          <div class="day"><div class="dh"><b>Wed</b><span>Oct 16</span></div><div class="tot">6.0 hrs total</div>
+            <div class="slot done"><div class="sh">AM<i></i></div><b>MATH302: Matrix Proof</b><span>3.0 hrs • Done</span></div>
+            <div class="slot done"><div class="sh">PM<i></i></div><b>PHYS105: Lab prep</b><span>3.0 hrs • Done</span></div>
+            <div class="slot eve"><div class="sh">EVE</div><b>Review Notes</b></div></div>
+          <div class="day today"><div class="dh"><b>Thu</b><span>Oct 17</span></div><div class="tot">Today • 6.0 hrs</div>
+            <div class="slot done"><div class="sh">AM<i></i></div><b>PHYS105: Lab Report</b><span>2.5 hrs • Completed</span></div>
+            <div class="slot live"><div class="sh">PM (In Progress)<i class="p" style="background:var(--primary)"></i></div><b>CS201: Midterm Rev</b><span>2.0 hrs in progress</span></div>
+            <div class="slot live" style="min-height:68px"><div class="sh">EVE (8:00 PM)</div><b>MATH302: Quiz Cram</b><span>1.5 hrs scheduled</span></div></div>
+          <div class="day"><div class="dh"><b>Fri</b><span>Oct 18</span></div><div class="tot">4.0 hrs total</div>
+            <div class="slot"><div class="sh">AM</div><b>MATH302: Submission</b><span>2.0 hrs</span></div>
+            <div class="slot"><div class="sh">PM</div><b>CS201: Mock Midterm</b><span>2.0 hrs</span></div>
+            <div class="slot eve"><div class="sh">EVE</div><b>Campus Seminar</b></div></div>
+          <div class="day"><div class="dh"><b>Sat</b><span>Oct 19</span></div><div class="tot">5.0 hrs total</div>
+            <div class="slot"><div class="sh">AM</div><b>CS201: Hard Q&amp;A Set</b><span>3.0 hrs</span></div>
+            <div class="slot"><div class="sh">PM</div><b>PHYS105: Chapter 6</b><span>2.0 hrs</span></div>
+            <div class="slot eve"><div class="sh">EVE</div><b>Weekend Downtime</b></div></div>
+          <div class="day"><div class="dh"><b>Sun</b><span>Oct 20</span></div><div class="tot">3.5 hrs total</div>
+            <div class="slot"><div class="sh">AM</div><b>Cheat Sheet Synthesis</b><span>2.0 hrs</span></div>
+            <div class="slot"><div class="sh">PM</div><b>Weekly Goal Audit</b><span>1.5 hrs</span></div>
+            <div class="slot eve"><div class="sh">EVE</div><b>Schedule Week 9</b></div></div>
+        </div>
+        <div class="hint">
+          <span><svg class="i"><use href="#i-drag"/></svg>Drag and drop sessions between slots to reschedule your week</span>
+          <span style="color:var(--primary)">Auto-saved</span>
+        </div>
+      </section>
+
+      <!-- ============ SECTION 4: STUDY SCHEDULE & REMINDERS ============ -->
+      <section class="s4" id="reminders" style="background:var(--bg)">
+        <div class="sec-head">
+          <div style="max-width:558px">
+            <div class="eyebrow"><svg class="i"><use href="#i-alarm"/></svg>Schedule &amp; Reminders</div>
+            <h2>Never Miss a Deadline</h2>
+            <p>High-alert deadlines at a glance, plus the recurring routine that keeps your focus steady all semester.</p>
+          </div>
+          <div class="channels">
+            <label><input type="checkbox" checked>Push</label>
+            <label><input type="checkbox" checked>Email</label>
+            <label><input type="checkbox">SMS alerts</label>
+          </div>
+        </div>
+
+        <div class="dual">
+          <div>
+            <div class="tl-head"><b>High Alert Timeline</b><span>3 upcoming</span></div>
+            <div class="card alert">
+              <div class="ic"><svg class="i"><use href="#i-clock"/></svg></div>
+              <div style="flex:1;min-width:0">
+                <div class="top"><h4>Problem Set #4 Deadline</h4><span class="tag t-red">Soon</span></div>
+                <p>MATH302 • Problem Set #4 PDF upload via Gradescope portal.</p>
+                <div class="m"><span><svg class="i"><use href="#i-cal"/></svg>Tomorrow 9:00 AM</span><span><svg class="i"><use href="#i-bell"/></svg>1h reminder</span></div>
+              </div>
+            </div>
+            <div class="card alert amber">
+              <div class="ic"><svg class="i"><use href="#i-timer"/></svg></div>
+              <div style="flex:1;min-width:0">
+                <div class="top"><h4>CS201 Pop Quiz</h4><span class="tag t-amber">Thu Evening</span></div>
+                <p>Computer Science 201 • Online 25-minute timed verification test.</p>
+                <div class="m"><span><svg class="i"><use href="#i-clock"/></svg>25 minutes</span><span><svg class="i"><use href="#i-bell"/></svg>30m reminder</span></div>
+              </div>
+            </div>
+            <div class="card alert blue">
+              <div class="ic"><svg class="i"><use href="#i-cap"/></svg></div>
+              <div style="flex:1;min-width:0">
+                <div class="top"><h4>CS201 Midterm Exam</h4><span class="tag t-blue">5 days</span></div>
+                <p>In-person Exam • Covers Graph Search, Dynamic Programming, Tree balancing.</p>
+                <div class="m"><span><svg class="i"><use href="#i-cal"/></svg>Next Tuesday</span><span><svg class="i"><use href="#i-bell"/></svg>Daily reminders</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card routine">
+            <div class="rh"><b>Recurring Routine</b><svg class="i"><use href="#i-alarm"/></svg></div>
+            <p>Standard rhythm designed to eliminate cognitive fatigue and maintain deep flow.</p>
+            <div>
+              <div class="habit"><span><svg class="i"><use href="#i-timer"/></svg>Pomodoro 25/5 blocks</span><em>Daily</em></div>
+              <div class="habit"><span><svg class="i"><use href="#i-book"/></svg>Morning review</span><em>7:30 AM</em></div>
+              <div class="habit"><span><svg class="i"><use href="#i-brain"/></svg>Flashcard recall</span><em>Eve</em></div>
+              <div class="habit"><span><svg class="i"><use href="#i-clock"/></svg>Wind-down reading</span><em>10 PM</em></div>
+            </div>
+            <div class="rfoot"><span>Next reminder: 25 min</span><a href="#reminders">Edit routine</a></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SECTION 5: IMPORTANT QUESTIONS ============ -->
+      <section class="s5" id="questions">
+        <div class="sec-head">
+          <div style="max-width:730px">
+            <div class="eyebrow"><svg class="i"><use href="#i-qbox"/></svg>Important Questions</div>
+            <h2>Revise the Questions That Matter</h2>
+            <p>A curated deck of high-yield exam questions, tagged by course and difficulty so you can drill the toughest topics first.</p>
+          </div>
+          <button class="q-add"><svg class="i" style="font-size:11px"><use href="#i-plus"/></svg>Add Question</button>
+        </div>
+
+        <div class="qs">
+          <div class="card q">
+            <div class="qt"><div class="tags"><span class="tag t-blue">CS201</span><span class="tag t-red">Hard</span><span class="tag t-grey">Data Structures</span></div>
+              <div class="btns"><button class="bm"><svg class="i"><use href="#i-bookmark"/></svg></button><button class="ex">Show Hint<svg class="i" style="font-size:8px"><use href="#i-chev"/></svg></button></div></div>
+            <h3>Prove that the height of an AVL tree with n nodes is strictly bounded by 1.44 log₂(n + 2) - 0.328.</h3>
+            <div class="topic">Topic: Balanced Binary Trees, Fibonacci bounds, mathematical induction recurrence proofs.</div>
+            <div class="ans">Hint: Let N(h) be the minimum number of nodes in an AVL tree of height h. Show N(h) = N(h−1) + N(h−2) + 1, relate it to Fibonacci numbers, then take logarithms.</div>
+          </div>
+          <div class="card q">
+            <div class="qt"><div class="tags"><span class="tag t-blue">MATH302</span><span class="tag t-amber">Medium</span><span class="tag t-grey">Linear Algebra</span></div>
+              <div class="btns"><button class="bm"><svg class="i"><use href="#i-bookmark"/></svg></button><button class="ex">Show Hint<svg class="i" style="font-size:8px"><use href="#i-chev"/></svg></button></div></div>
+            <h3>Under what condition is a symmetric matrix A strictly positive-definite?</h3>
+            <div class="topic">Topic: Sylvester’s Criterion, Eigenvalue positivity, quadratic forms xᵀAx &gt; 0.</div>
+            <div class="ans">Hint: A is positive-definite exactly when all its eigenvalues are positive, equivalently when every leading principal minor is positive (Sylvester's criterion).</div>
+          </div>
+          <div class="card q">
+            <div class="qt"><div class="tags"><span class="tag t-blue">PHYS105</span><span class="tag t-red">Hard</span><span class="tag t-grey">Electromagnetism</span></div>
+              <div class="btns"><button class="bm"><svg class="i"><use href="#i-bookmark"/></svg></button><button class="ex">Show Hint<svg class="i" style="font-size:8px"><use href="#i-chev"/></svg></button></div></div>
+            <h3>Derive the displacement current term in Ampère-Maxwell law for a discharging parallel-plate capacitor.</h3>
+            <div class="topic">Topic: Continuity equation, dielectric boundary flux, magnetic circulation curl(B).</div>
+            <div class="ans">Hint: Start from the continuity equation, substitute ∇·E = ρ/ε₀, and show that adding ε₀ ∂E/∂t to the current density keeps Ampère's law consistent.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SECTION 6: WEEKLY PROGRESS TRACKER ============ -->
+      <section class="s6" id="progress">
+        <div style="margin-bottom:24px">
+          <div class="eyebrow"><svg class="i"><use href="#i-trend"/></svg>Progress Tracker</div>
+          <h2>Weekly Productivity &amp; Analytics Tracker</h2>
+          <p style="font:400 15px/24px var(--inter);color:var(--ink-2)">Quantitative focus distributions, course completion ratios, and reflective learning synthesis.</p>
+        </div>
+
+        <div class="bento">
+          <div class="card chart">
+            <div class="ch">
+              <div><b>Study Hour Distribution</b><span class="s">Hours studied per day this week</span></div>
+              <div class="badge">26 hrs this week</div>
+            </div>
+            <div class="bars">
+              <div class="b"><em>3.6</em><i style="height:84.6px"></i><span>Mon</span></div>
+              <div class="b"><em>4.0</em><i style="height:94px"></i><span>Tue</span></div>
+              <div class="b"><em>4.8</em><i style="height:112.8px"></i><span>Wed</span></div>
+              <div class="b today"><em>3.6</em><i style="height:84.6px"></i><span>Thu</span></div>
+              <div class="b"><em>3.2</em><i style="height:75.2px"></i><span>Fri</span></div>
+              <div class="b"><em>4.0</em><i style="height:94px"></i><span>Sat</span></div>
+              <div class="b"><em>2.8</em><i style="height:65.8px"></i><span>Sun</span></div>
+            </div>
+            <div class="cfoot"><span><svg class="i"><use href="#i-trend"/></svg>Wednesday was your peak focus day</span><span>Avg 3.7 hrs/day</span></div>
+          </div>
+
+          <div>
+            <div class="card streak-card">
+              <div>
+                <small>Current Streak</small>
+                <div class="n"><b>14</b><span>days</span></div>
+                <p>You are among the top 5% of persistent learners this semester.</p>
+              </div>
+              <div class="fl"><svg class="i"><use href="#i-flame"/></svg></div>
+            </div>
+            <div class="card comp">
+              <b>Course Module Completion</b>
+              <div class="row"><div><span>CS201 Data Structures</span><span>92%</span></div><div class="bar"><i style="width:92%"></i></div></div>
+              <div class="row"><div><span>MATH302 Linear Algebra</span><span>78%</span></div><div class="bar"><i style="width:78%"></i></div></div>
+              <div class="row"><div><span>PHYS105 Electromagnetism</span><span>65%</span></div><div class="bar"><i style="width:65%"></i></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="refl">
+          <div class="card"><div class="ic"><svg class="i"><use href="#i-brain"/></svg></div>
+            <div><b>Weekly Reflection</b><p>What worked well this week? Note which study methods kept you focused and which sessions felt unproductive.</p></div></div>
+          <div class="card"><div class="ic"><svg class="i"><use href="#i-check"/></svg></div>
+            <div><b>Self-Assessment</b><p>Rate your confidence for each course and set one improvement goal to carry into next week's plan.</p></div></div>
+        </div>
+      </section>
+
+      <!-- ============ FREE AUDIT FORM (3 fields → Google Sheets) ============ -->
+      <section class="sform" id="audit">
+        <div class="formcard">
+          <div class="fl">
+            <div class="eyebrow" style="color:#fff;opacity:.9"><svg class="i"><use href="#i-bolt"/></svg>Free Study Audit</div>
+            <h2 style="margin-top:6px">Get your personalised study audit</h2>
+            <p>Share your details and we'll review your study plan, find where your hours are leaking and send tailored suggestions.</p>
+            <ul>
+              <li><svg class="i"><use href="#i-check"/></svg>Personalised weekly plan review</li>
+              <li><svg class="i"><use href="#i-check"/></svg>Focus &amp; habit recommendations</li>
+              <li><svg class="i"><use href="#i-check"/></svg>No spam, just useful tips</li>
+            </ul>
+          </div>
+          <div class="fr">
+            <form id="auditForm" novalidate>
+              <div class="fld"><label for="f-name">Name</label><input id="f-name" name="name" type="text" placeholder="Your full name" required autocomplete="name"></div>
+              <div class="fld"><label for="f-email">Email</label><input id="f-email" name="email" type="email" placeholder="you@example.com" required autocomplete="email"></div>
+              <div class="fld"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" placeholder="10-digit mobile number" required autocomplete="tel"></div>
+              <button type="submit" class="submit" id="submitBtn"><svg class="i"><use href="#i-send"/></svg><span>Get My Free Audit</span></button>
+              <div class="msg" id="formMsg" role="status"></div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SECTION 7: FAQS & FOOTER ============ -->
+      <section class="s7" id="faqs">
+        <div class="faq-head">
+          <div class="eyebrow"><svg class="i"><use href="#i-qbox"/></svg>FAQs &amp; Support</div>
+          <h2>Frequently Asked Questions</h2>
+          <p>Quick answers about planning, reminders and tracking your progress in StudyFlow.</p>
+        </div>
+        <div class="faqs">
+          <div class="faq"><button><span>How does the weekly planner balance my study load?</span><svg class="i"><use href="#i-chev"/></svg></button>
+            <div class="a">The planner splits each day into morning, afternoon and evening slots and shows total hours per day, so you can quickly spot overloaded days and move sessions around.</div></div>
+          <div class="faq"><button><span>Can I get reminders through email and push notifications?</span><svg class="i"><use href="#i-chev"/></svg></button>
+            <div class="a">Yes. In Schedule &amp; Reminders you can switch on push, email or SMS alerts and choose how early each deadline reminder should arrive.</div></div>
+          <div class="faq"><button><span>How is my weekly goal percentage calculated?</span><svg class="i"><use href="#i-chev"/></svg></button>
+            <div class="a">It compares the focus hours and tasks you've completed this week against the targets you set in the planner.</div></div>
+          <div class="faq"><button><span>What counts towards my study streak?</span><svg class="i"><use href="#i-chev"/></svg></button>
+            <div class="a">Any day where you complete at least one planned study session keeps your streak alive.</div></div>
+        </div>
+
+        <div class="help">
+          <div class="hl2">
+            <div class="ic"><svg class="i"><use href="#i-headset"/></svg></div>
+            <div><b>Still need help?</b><span class="d">Our support team usually replies within a few hours.</span></div>
+          </div>
+          <div class="hb"><button>Contact Support</button><a href="#audit">Free Audit</a></div>
+        </div>
+
+        <footer>
+          <div class="fb"><div class="lg"><svg class="i"><use href="#i-book"/></svg></div><b>StudyFlow</b><span>•</span><span>Academic Momentum</span></div>
+          <div class="links"><a href="#dashboard">Privacy</a><a href="#faqs">Terms</a><a href="#faqs">Help</a><a href="#faqs">Contact</a><a href="#faqs">Status</a></div>
+          <div class="cp">© 2024 StudyFlow. All rights reserved.</div>
+        </footer>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+/* ===================== CONFIG ===================== */
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyO5DfpSxdya0tEHAv1WBbyALek8vXZxwQP-AiUJnD-0dDgwaospOyxIEzOUKvgciEP/exec";
+
+/* ===================== FORM → GOOGLE SHEETS ===================== */
+var form = document.getElementById("auditForm");
+var msg = document.getElementById("formMsg");
+var btn = document.getElementById("submitBtn");
+
+function showSuccess() {
+  btn.disabled = false;
+  btn.querySelector("span").textContent = "Get My Free Audit";
+  msg.className = "msg ok";
+  msg.textContent = "Thank you! Your details have been submitted. We'll be in touch soon.";
+  form.reset();
+}
+function showError() {
+  btn.disabled = false;
+  btn.querySelector("span").textContent = "Get My Free Audit";
+  msg.className = "msg err";
+  msg.textContent = "Something went wrong. Please check your connection and try again.";
+}
+
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+  var name = document.getElementById("f-name").value.trim();
+  var email = document.getElementById("f-email").value.trim();
+  var phone = document.getElementById("f-phone").value.trim();
+
+  if (!name || !email || !phone) {
+    msg.className = "msg err";
+    msg.textContent = "Please fill in your name, email and phone.";
+    return;
+  }
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    msg.className = "msg err";
+    msg.textContent = "Please enter a valid email address.";
+    return;
+  }
+
+  msg.className = "msg";
+  btn.disabled = true;
+  btn.querySelector("span").textContent = "Submitting...";
+
+  var url = SCRIPT_URL + "?" + new URLSearchParams({ name: name, email: email, phone: phone });
+  fetch(url, { method: "GET", mode: "no-cors" })
+    .then(() => showSuccess())
+    .catch(() => showError());
+});
+
+/* ===================== TASKS ===================== */
+var statusF = "all", courseF = "all";
+function applyFilters() {
+  document.querySelectorAll("#taskList .task").forEach(function (t) {
+    var done = t.classList.contains("done");
+    var okS = statusF === "all" || (statusF === "done" && done) || (statusF === "pending" && !done) || (statusF === "urgent" && t.dataset.urgent === "1" && !done);
+    var okC = courseF === "all" || t.dataset.course === courseF;
+    t.classList.toggle("hide", !(okS && okC));
+  });
+}
+document.getElementById("taskList").addEventListener("click", function (e) {
+  var ck = e.target.closest(".ck");
+  if (ck) { ck.closest(".task").classList.toggle("done"); applyFilters(); }
+});
+document.getElementById("statusFilters").addEventListener("click", function (e) {
+  var b = e.target.closest("button"); if (!b) return;
+  document.querySelectorAll("#statusFilters button").forEach(function (x) { x.classList.remove("on"); });
+  b.classList.add("on"); statusF = b.dataset.f; applyFilters();
+});
+document.getElementById("courseChips").addEventListener("click", function (e) {
+  var b = e.target.closest("button"); if (!b) return;
+  document.querySelectorAll("#courseChips button").forEach(function (x) { x.classList.remove("on"); });
+  b.classList.add("on"); courseF = b.dataset.c; applyFilters();
+});
+function esc(s) { var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+function addTask() {
+  var inp = document.getElementById("newTask");
+  var text = inp.value.trim(); if (!text) { inp.focus(); return; }
+  var course = document.getElementById("newCourse").value;
+  var pri = document.getElementById("newPri").value;
+  var title = text.replace(/^[A-Z]+\d+\s*:\s*/, "");
+  var el = document.createElement("div");
+  el.className = "card task"; el.dataset.course = course; el.dataset.urgent = pri === "High" ? "1" : "0";
+  el.innerHTML = '<div class="l"><button class="ck"><svg class="i"><use href="#i-check"/></svg></button><div><div class="meta"><span class="tag t-blue">' + esc(course) + '</span><span class="tag t-amber">' + esc(pri) + '</span></div><h4>' + esc(title) + '</h4><p>Added just now.</p></div></div><div class="r"><div><span>No due date</span></div><button class="more"><svg class="i"><use href="#i-dots"/></svg></button></div>';
+  document.getElementById("taskList").prepend(el);
+  inp.value = ""; applyFilters();
+}
+document.getElementById("addTaskBtn").addEventListener("click", addTask);
+document.getElementById("newTask").addEventListener("keydown", function (e) { if (e.key === "Enter") addTask(); });
+
+/* ===================== ACCORDIONS & BOOKMARKS ===================== */
+document.querySelectorAll(".faq button").forEach(function (b) {
+  b.addEventListener("click", function () { b.parentElement.classList.toggle("open"); });
+});
+document.querySelectorAll(".q .ex").forEach(function (b) {
+  b.addEventListener("click", function () {
+    var q = b.closest(".q"); q.classList.toggle("open");
+    b.firstChild.textContent = q.classList.contains("open") ? "Hide Hint" : "Show Hint";
+  });
+});
+document.querySelectorAll(".q .bm").forEach(function (b) {
+  b.addEventListener("click", function () { b.classList.toggle("on"); });
+});
+
+/* ===================== SIDEBAR ACTIVE LINK ===================== */
+var links = document.querySelectorAll("nav a");
+var secs = Array.prototype.map.call(links, function (a) { return document.querySelector(a.getAttribute("href")); });
+window.addEventListener("scroll", function () {
+  var y = window.scrollY + 120, idx = 0;
+  secs.forEach(function (s, i) { if (s && s.offsetTop <= y) idx = i; });
+  links.forEach(function (a, i) { a.classList.toggle("active", i === idx); });
+}, { passive: true });
+</script>
+</body>
+</html>
